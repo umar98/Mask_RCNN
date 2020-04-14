@@ -147,7 +147,7 @@ def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2),
     scale_name_base = 'scale' + str(stage) + block + '_branch'
 	
     bn_axis = 3
-    x = KL.Conv2D(nb_filter1, (1, 1), subsample=strides,
+    x = KL.Conv2D(nb_filter1, (1, 1), strides=strides,
                       name=conv_name_base + '2a', use_bias=use_bias)(input_tensor)
     x = KL.BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2a')(x, training=train_bn)
     x = Scale(axis=bn_axis, name=scale_name_base + '2a')(x)
@@ -164,7 +164,7 @@ def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2),
     x = KL.BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2c')(x, training=train_bn)
     x = Scale(axis=bn_axis, name=scale_name_base + '2c')(x)
 
-    shortcut = KL.Conv2D(nb_filter3, (1, 1), subsample=strides,
+    shortcut = KL.Conv2D(nb_filter3, (1, 1), strides=strides,
                              name=conv_name_base + '1', use_bias=use_bias)(input_tensor)
     shortcut = KL.BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '1')(shortcut, training=train_bn)
     shortcut = Scale(axis=bn_axis, name=scale_name_base + '1')(shortcut)
