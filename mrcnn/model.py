@@ -103,6 +103,7 @@ def identity_block(input_tensor, kernel_size, filters, stage, block,
         block: 'a','b'..., current block label, used for generating layer names
     '''
     eps = 1.1e-5
+    bn_axis = 3
     nb_filter1, nb_filter2, nb_filter3 = filters
     conv_name_base = 'res' + str(stage) + block + '_branch'
     bn_name_base = 'bn' + str(stage) + block + '_branch'
@@ -145,7 +146,7 @@ def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2),
     bn_name_base = 'bn' + str(stage) + block + '_branch'
     scale_name_base = 'scale' + str(stage) + block + '_branch'
 	
-    global bn_axis=3
+    bn_axis = 3
     x = KL.Convolution2D(nb_filter1, 1, 1, subsample=strides,
                       name=conv_name_base + '2a', bias=False)(input_tensor)
     x = KL.BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2a')(x, training=train_bn)
