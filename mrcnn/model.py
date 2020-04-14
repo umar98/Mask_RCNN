@@ -122,7 +122,7 @@ def identity_block(input_tensor, kernel_size, filters, stage, block,
     x = KL.Activation('relu', name=conv_name_base + '2b_relu')(x)
 
     x = KL.Convolution2D(nb_filter3, 1, 1, name=conv_name_base + '2c', bias=False)(x)
-    x = BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2c')(x, training=train_bn)
+    x = KL.BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2c')(x, training=train_bn)
     x = KL.Scale(axis=bn_axis, name=scale_name_base + '2c')(x)
 
     x = KL.Add()([x, input_tensor])#x = KL.merge([x, input_tensor], mode='sum', name='res' + str(stage) + block)
