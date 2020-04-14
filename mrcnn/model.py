@@ -125,7 +125,7 @@ def identity_block(input_tensor, kernel_size, filters, stage, block,
     x = BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2c')(x, training=train_bn)
     x = KL.Scale(axis=bn_axis, name=scale_name_base + '2c')(x)
 
-    x = KL.merge([x, input_tensor], mode='sum', name='res' + str(stage) + block)
+    x = KL.Add()([x, input_tensor])#x = KL.merge([x, input_tensor], mode='sum', name='res' + str(stage) + block)
     x = KL.Activation('relu', name='res' + str(stage) + block + '_relu')(x)
     return x
 
@@ -166,10 +166,10 @@ def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2),
 
     shortcut = KL.Convolution2D(nb_filter3, 1, 1, subsample=strides,
                              name=conv_name_base + '1', bias=False)(input_tensor)
-    shortcut = KL.BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '1')(shortcut)
+    shortcut = KL.BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '1')(shortcut, training=train_bn)
     shortcut = Scale(axis=bn_axis, name=scale_name_base + '1')(shortcut)
 
-    x = KL.merge([x, shortcut], mode='sum', name='res' + str(stage) + block)
+    x = KL.Add()([x, shortcut])#x = KL.merge([x, shortcut], mode='sum', name='res' + str(stage) + block)
     x = KL.Activation('relu', name='res' + str(stage) + block + '_relu')(x)
     return x
 
