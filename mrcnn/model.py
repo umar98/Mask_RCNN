@@ -29,7 +29,7 @@ from mrcnn.custom_layers.scale_layer import Scale
 from distutils.version import LooseVersion
 assert LooseVersion(tf.__version__) >= LooseVersion("1.3")
 assert LooseVersion(keras.__version__) >= LooseVersion('2.0.8')
-
+tf.compat.v1.disable_eager_execution()
 
 ############################################################
 #  Utility Functions
@@ -2168,7 +2168,6 @@ class MaskRCNN():
         # First, clear previously set losses to avoid duplication
         self.keras_model._losses = []
         self.keras_model._per_input_losses = {}
-	tf.compat.v1.disable_eager_execution()
         loss_names = [
             "rpn_class_loss",  "rpn_bbox_loss",
             "mrcnn_class_loss", "mrcnn_bbox_loss", "mrcnn_mask_loss"]
