@@ -92,7 +92,8 @@ def compute_backbone_shapes(config, image_shape):
 # Code adopted from:
 # https://github.com/fchollet/deep-learning-models/blob/master/resnet50.py
 
-def identity_block(input_tensor, kernel_size, filters, stage, block):
+def identity_block(input_tensor, kernel_size, filters, stage, block,
+                   use_bias=True, train_bn=True):
     '''The identity_block is the block that has no conv layer at shortcut
     # Arguments
         input_tensor: input tensor
@@ -108,26 +109,26 @@ def identity_block(input_tensor, kernel_size, filters, stage, block):
     scale_name_base = 'scale' + str(stage) + block + '_branch'
 
     x = Convolution2D(nb_filter1, 1, 1, name=conv_name_base + '2a', bias=False)(input_tensor)
-    x = BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2a')(x)
+    x = BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2a')(x, training=train_bn)
     x = Scale(axis=bn_axis, name=scale_name_base + '2a')(x)
     x = Activation('relu', name=conv_name_base + '2a_relu')(x)
 
     x = ZeroPadding2D((1, 1), name=conv_name_base + '2b_zeropadding')(x)
     x = Convolution2D(nb_filter2, kernel_size, kernel_size,
                       name=conv_name_base + '2b', bias=False)(x)
-    x = BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2b')(x)
+    x = BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2b')(x, training=train_bn)
     x = Scale(axis=bn_axis, name=scale_name_base + '2b')(x)
     x = Activation('relu', name=conv_name_base + '2b_relu')(x)
 
     x = Convolution2D(nb_filter3, 1, 1, name=conv_name_base + '2c', bias=False)(x)
-    x = BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2c')(x)
+    x = BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2c')(x, training=train_bn)
     x = Scale(axis=bn_axis, name=scale_name_base + '2c')(x)
 
     x = merge([x, input_tensor], mode='sum', name='res' + str(stage) + block)
     x = Activation('relu', name='res' + str(stage) + block + '_relu')(x)
     return x
 
-def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2)):
+def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2), use_bias=True, train_bn=True):
     '''conv_block is the block that has a conv layer at shortcut
     # Arguments
         input_tensor: input tensor
@@ -146,19 +147,19 @@ def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2))
 
     x = Convolution2D(nb_filter1, 1, 1, subsample=strides,
                       name=conv_name_base + '2a', bias=False)(input_tensor)
-    x = BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2a')(x)
+    x = BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2a')(x, training=train_bn)
     x = Scale(axis=bn_axis, name=scale_name_base + '2a')(x)
     x = Activation('relu', name=conv_name_base + '2a_relu')(x)
 
     x = ZeroPadding2D((1, 1), name=conv_name_base + '2b_zeropadding')(x)
     x = Convolution2D(nb_filter2, kernel_size, kernel_size,
                       name=conv_name_base + '2b', bias=False)(x)
-    x = BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2b')(x)
+    x = BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2b')(x, training=train_bn)
     x = Scale(axis=bn_axis, name=scale_name_base + '2b')(x)
     x = Activation('relu', name=conv_name_base + '2b_relu')(x)
 
     x = Convolution2D(nb_filter3, 1, 1, name=conv_name_base + '2c', bias=False)(x)
-    x = BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2c')(x)
+    x = BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2c')(x, training=train_bn)
     x = Scale(axis=bn_axis, name=scale_name_base + '2c')(x)
 
     shortcut = Convolution2D(nb_filter3, 1, 1, subsample=strides,
