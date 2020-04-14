@@ -109,19 +109,19 @@ def identity_block(input_tensor, kernel_size, filters, stage, block,
     scale_name_base = 'scale' + str(stage) + block + '_branch'
 
     x = KL.Convolution2D(nb_filter1, 1, 1, name=conv_name_base + '2a', bias=False)(input_tensor)
-    x = KL.BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2a')(x, training=train_bn)
+    x = KL.BatchNormalization(epsilon=eps, name=bn_name_base + '2a')(x, training=train_bn)
     x = Scale(axis=bn_axis, name=scale_name_base + '2a')(x)
     x = KL.Activation('relu', name=conv_name_base + '2a_relu')(x)
 
     x = KL.ZeroPadding2D((1, 1), name=conv_name_base + '2b_zeropadding')(x)
     x = KL.Convolution2D(nb_filter2, kernel_size, kernel_size,
                       name=conv_name_base + '2b', bias=False)(x)
-    x = KL.BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2b')(x, training=train_bn)
+    x = KL.BatchNormalization(epsilon=eps, name=bn_name_base + '2b')(x, training=train_bn)
     x = Scale(axis=bn_axis, name=scale_name_base + '2b')(x)
     x = KL.Activation('relu', name=conv_name_base + '2b_relu')(x)
 
     x = KL.Convolution2D(nb_filter3, 1, 1, name=conv_name_base + '2c', bias=False)(x)
-    x = BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2c')(x, training=train_bn)
+    x = BatchNormalization(epsilon=eps, name=bn_name_base + '2c')(x, training=train_bn)
     x = KL.Scale(axis=bn_axis, name=scale_name_base + '2c')(x)
 
     x = KL.merge([x, input_tensor], mode='sum', name='res' + str(stage) + block)
@@ -147,24 +147,24 @@ def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2),
 
     x = KL.Convolution2D(nb_filter1, 1, 1, subsample=strides,
                       name=conv_name_base + '2a', bias=False)(input_tensor)
-    x = KL.BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2a')(x, training=train_bn)
+    x = KL.BatchNormalization(epsilon=eps, name=bn_name_base + '2a')(x, training=train_bn)
     x = Scale(axis=bn_axis, name=scale_name_base + '2a')(x)
     x = KL.Activation('relu', name=conv_name_base + '2a_relu')(x)
 
     x = KL.ZeroPadding2D((1, 1), name=conv_name_base + '2b_zeropadding')(x)
     x = KL.Convolution2D(nb_filter2, kernel_size, kernel_size,
                       name=conv_name_base + '2b', bias=False)(x)
-    x = KL.BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2b')(x, training=train_bn)
+    x = KL.BatchNormalization(epsilon=eps, name=bn_name_base + '2b')(x, training=train_bn)
     x = Scale(axis=bn_axis, name=scale_name_base + '2b')(x)
     x = KL.Activation('relu', name=conv_name_base + '2b_relu')(x)
 
     x = KL.Convolution2D(nb_filter3, 1, 1, name=conv_name_base + '2c', bias=False)(x)
-    x = KL.BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2c')(x, training=train_bn)
+    x = KL.BatchNormalization(epsilon=eps, name=bn_name_base + '2c')(x, training=train_bn)
     x = Scale(axis=bn_axis, name=scale_name_base + '2c')(x)
 
     shortcut = KL.Convolution2D(nb_filter3, 1, 1, subsample=strides,
                              name=conv_name_base + '1', bias=False)(input_tensor)
-    shortcut = KL.BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '1')(shortcut)
+    shortcut = KL.BatchNormalization(epsilon=eps, name=bn_name_base + '1')(shortcut)
     shortcut = Scale(axis=bn_axis, name=scale_name_base + '1')(shortcut)
 
     x = KL.merge([x, shortcut], mode='sum', name='res' + str(stage) + block)
