@@ -29,6 +29,7 @@ from mrcnn.custom_layers.scale_layer import Scale
 from distutils.version import LooseVersion
 assert LooseVersion(tf.__version__) >= LooseVersion("1.3")
 assert LooseVersion(keras.__version__) >= LooseVersion('2.0.8')
+global bn_axis
 tf.compat.v1.disable_eager_execution()
 
 ############################################################
@@ -103,7 +104,10 @@ def identity_block(input_tensor, kernel_size, filters, stage, block,
         block: 'a','b'..., current block label, used for generating layer names
     '''
     eps = 1.1e-5
-    bn_axis = 3
+    if K.image_data_format() == 'channels_last':
+        bn_axis = 3
+    else:
+        bn_axis = 1#bn_axis = 3
     nb_filter1, nb_filter2, nb_filter3 = filters
     conv_name_base = 'res' + str(stage) + block + '_branch'
     bn_name_base = 'bn' + str(stage) + block + '_branch'
@@ -125,7 +129,7 @@ def identity_block(input_tensor, kernel_size, filters, stage, block,
     x = KL.BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2c')(x, training=train_bn)
     x = Scale(axis=bn_axis, name=scale_name_base + '2c')(x)
 
-    x = KL.Add()([x, input_tensor])#x = KL.merge([x, input_tensor], mode='sum', name='res' + str(stage) + block)#
+    x = KL.Concatenate([x, input_tensor], mode='sum', name='res' + str(stage) + block)#x = KL.Add()([x, input_tensor])#
     x = KL.Activation('relu', name='res' + str(stage) + block + '_relu')(x)
     return x
 
@@ -146,7 +150,10 @@ def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2),
     bn_name_base = 'bn' + str(stage) + block + '_branch'
     scale_name_base = 'scale' + str(stage) + block + '_branch'
 	
-    bn_axis = 3
+    if K.image_data_format() == 'channels_last':
+        bn_axis = 3
+    else:
+        bn_axis = 1#bn_axis = 3
     x = KL.Conv2D(nb_filter1, (1, 1), strides=strides,
                       name=conv_name_base + '2a', use_bias=use_bias)(input_tensor)
     x = KL.BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '2a')(x, training=train_bn)
@@ -169,7 +176,7 @@ def conv_block(input_tensor, kernel_size, filters, stage, block, strides=(2, 2),
     shortcut = KL.BatchNormalization(epsilon=eps, axis=bn_axis, name=bn_name_base + '1')(shortcut, training=train_bn)
     shortcut = Scale(axis=bn_axis, name=scale_name_base + '1')(shortcut)
 
-    x = KL.Add()([x, shortcut])#x = KL.merge([x, shortcut], mode='sum', name='res' + str(stage) + block)#
+    x = KL.Concatenate([x, shortcut], mode='sum', name='res' + str(stage) + block)#x = KL.Add()([x, shortcut])#
     x = KL.Activation('relu', name='res' + str(stage) + block + '_relu')(x)
     return x
 
